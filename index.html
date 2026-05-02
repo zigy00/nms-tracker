@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NMS Trade Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+
+:root{
+  --bg:#0a0c10;
+  --surface:#111318;
+  --surface-2:#181c24;
+  --surface-3:#1e2330;
+  --border:rgba(255,255,255,0.06);
+  --border-bright:rgba(255,255,255,0.10);
+  --text:#e8eaf0;
+  --text-muted:#8b90a0;
+  --text-faint:#4a5060;
+  --primary:#00d4aa;
+  --primary-dim:rgba(0,212,170,0.13);
+  --gold:#f0c040;
+  --gold-dim:rgba(240,192,64,0.13);
+  --red:#ff5566;
+  --red-dim:rgba(255,85,102,0.13);
+  --purple:#a78bfa;
+  --purple-dim:rgba(167,139,250,0.13);
+  --orange:#fb923c;
+  --orange-dim:rgba(251,146,60,0.13);
+  --blue:#60a5fa;
+  --blue-dim:rgba(96,165,250,0.13);
+  --green:#4ade80;
+  --green-dim:rgba(74,222,128,0.13);
+  --gray:#8b90a0;
+  --gray-dim:rgba(139,144,160,0.13);
+  --r-sm:6px;--r-md:10px;--r-lg:14px;--r-xl:20px;
+  --font-body:'Space Grotesk',sans-serif;
+  --font-mono:'Space Mono',monospace;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100dvh;font-size:16px;line-height:1.6}
+
+.header{
+  padding:20px 24px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:14px;
+  background:linear-gradient(180deg,#0d1018 0%,transparent 100%);
+  position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);
+}
+.logo-svg{filter:drop-shadow(0 0 8px var(--primary))}
+.header-title{font-size:18px;font-weight:700;letter-spacing:-0.3px}
+.header-title span{color:var(--primary)}
+.header-subtitle{font-size:12px;color:var(--text-muted);margin-top:1px}
+.theme-btn{margin-left:auto;background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);padding:8px;border-radius:var(--r-md);cursor:pointer;line-height:0;transition:all 180ms}
+.theme-btn:hover{color:var(--text);border-color:var(--border-bright)}
+
+.main{max-width:1100px;margin:0 auto;padding:28px 20px 60px}
+.section-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);margin-bottom:16px;padding-left:2px}
+
+/* ROUTES */
+.routes-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
+@media(max-width:680px){.routes-grid{grid-template-columns:1fr}}
+.route-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px;position:relative;overflow:hidden}
+.route-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--rc),transparent)}
+.route-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;padding:3px 8px;border-radius:9999px;margin-bottom:10px}
+.rb1{background:rgba(0,212,170,0.13);color:var(--primary);border:1px solid rgba(0,212,170,0.2)}
+.rb2{background:rgba(167,139,250,0.13);color:var(--purple);border:1px solid rgba(167,139,250,0.2)}
+.route-title{font-size:13px;font-weight:700;letter-spacing:0.5px;color:var(--text-muted);text-transform:uppercase;margin-bottom:14px}
+.route-steps{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.step-chip{display:flex;align-items:center;gap:7px;background:var(--surface-2);border:1px solid var(--border);border-radius:9999px;padding:6px 12px;font-size:13px;font-weight:500;white-space:nowrap}
+.step-arrow{color:var(--text-faint);font-size:14px}
+
+/* ECONOMY GROUPS */
+.economy-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.egroup{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden}
+.egroup-header{padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;border-bottom:1px solid var(--border);user-select:none;transition:background 180ms}
+.egroup-header:hover{background:var(--surface-2)}
+.eicon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-md);font-size:17px;flex-shrink:0}
+.ename{font-size:14px;font-weight:600;flex:1}
+.ecount{font-size:11px;font-weight:600;color:var(--text-muted);background:var(--surface-3);padding:2px 8px;border-radius:9999px}
+.echev{color:var(--text-faint);font-size:11px;margin-left:4px;display:inline-block;transition:transform 200ms}
+.egroup.open .echev{transform:rotate(180deg)}
+
+.ebody{display:none;padding:12px}
+.egroup.open .ebody{display:block}
+
+.slist{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.sitem{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:8px 12px;font-size:13px}
+.sbadge{font-family:var(--font-mono);font-size:11px;font-weight:700;padding:2px 7px;border-radius:9999px;white-space:nowrap}
+.sname{flex:1;font-weight:500}
+.sdel{background:none;border:none;color:var(--text-faint);cursor:pointer;padding:3px 7px;border-radius:var(--r-sm);font-size:13px;line-height:1;transition:all 150ms}
+.sdel:hover{color:var(--red);background:var(--red-dim)}
+.sempty{text-align:center;padding:10px 0;color:var(--text-faint);font-size:12px}
+
+/* ADD FORM */
+.add-row{display:flex;gap:8px}
+.add-input{flex:1;background:var(--surface-3);border:1px solid var(--border);color:var(--text);border-radius:var(--r-md);padding:9px 12px;font-family:inherit;font-size:13px;outline:none;transition:border-color 150ms;min-width:0}
+.add-input::placeholder{color:var(--text-faint)}
+.add-input:focus{border-color:var(--ec,var(--primary))}
+.abtn{background:var(--ec-dim,var(--primary-dim));border:1px solid var(--ec,var(--primary));color:var(--ec,var(--primary));padding:9px 14px;border-radius:var(--r-md);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 150ms}
+.abtn:hover{filter:brightness(1.2)}
+
+/* CALCULATOR */
+.calc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px}
+.calc-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.calc-field{flex:1;min-width:160px}
+.flabel{font-size:11px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
+.cinput{width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:var(--r-md);padding:11px 14px;font-family:var(--font-mono);font-size:16px;outline:none;transition:border-color 150ms}
+.cinput:focus{border-color:var(--primary)}
+.cinput::placeholder{color:var(--text-faint)}
+.cbtn{background:var(--primary-dim);border:1px solid var(--primary);color:var(--primary);padding:11px 24px;border-radius:var(--r-md);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 150ms;height:46px}
+.cbtn:hover{background:var(--primary);color:#0a0c10}
+
+.cresult{margin-top:16px;padding:14px 18px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--border);background:var(--surface-2);opacity:0;transition:opacity 300ms}
+.cresult.show{opacity:1}
+.cresult.profit-r{border-color:rgba(0,212,170,0.25);background:rgba(0,212,170,0.04)}
+.cresult.loss-r{border-color:rgba(255,85,102,0.25);background:rgba(255,85,102,0.04)}
+.rlabel{font-size:12px;color:var(--text-muted);font-weight:600;letter-spacing:0.5px;text-transform:uppercase}
+.rvalue{font-family:var(--font-mono);font-size:22px;font-weight:700}
+.rvalue.profit{color:var(--primary)}
+.rvalue.loss{color:var(--red)}
+
+.divider{height:1px;background:var(--border);margin:28px 0}
+
+[data-theme="light"]{
+  --bg:#f4f4f0;--surface:#fff;--surface-2:#f0f0ec;--surface-3:#e8e8e3;
+  --border:rgba(0,0,0,0.10);--border-bright:rgba(0,0,0,0.15);
+  --text:#111;--text-muted:#555;--text-faint:#aaa;
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <svg class="logo-svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <polygon points="14,2 26,8 26,20 14,26 2,20 2,8" stroke="#00d4aa" stroke-width="1.5" fill="rgba(0,212,170,0.1)"/>
+    <circle cx="14" cy="14" r="4" fill="#00d4aa"/>
+    <line x1="14" y1="6" x2="14" y2="10" stroke="#00d4aa" stroke-width="1.5"/>
+    <line x1="14" y1="18" x2="14" y2="22" stroke="#00d4aa" stroke-width="1.5"/>
+    <line x1="6.5" y1="10" x2="10" y2="12" stroke="#00d4aa" stroke-width="1.5"/>
+    <line x1="18" y1="16" x2="21.5" y2="18" stroke="#00d4aa" stroke-width="1.5"/>
+  </svg>
+  <div>
+    <div class="header-title">NMS <span>Trade Tracker</span></div>
+    <div class="header-subtitle">No Man's Sky &middot; Economy Route Manager</div>
+  </div>
+  <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <button class="theme-btn" id="saveBtn" title="Save stations to file" aria-label="Save">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+  </button>
+  <label class="theme-btn" title="Load stations from file" style="cursor:pointer;display:flex;align-items:center;justify-content:center">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    <input type="file" id="loadFile" accept=".json" style="display:none">
+  </label>
+</header>
+
+<main class="main">
+
+  <div class="section-label">Trade Routes</div>
+  <div class="routes-grid">
+    <div class="route-card" style="--rc:#00d4aa">
+      <div class="route-badge rb1">Route Alpha</div>
+      <div class="route-title">Exchange / Commerce Route</div>
+      <div class="route-steps">
+        <div class="step-chip"><span>&#8987;</span> Trading</div>
+        <span class="step-arrow">&#8594;</span>
+        <div class="step-chip"><span>&#129516;</span> Adv. Materials</div>
+        <span class="step-arrow">&#8594;</span>
+        <div class="step-chip"><span>&#9879;&#65039;</span> Scientific</div>
+      </div>
+    </div>
+    <div class="route-card" style="--rc:#a78bfa">
+      <div class="route-badge rb2">Route Beta</div>
+      <div class="route-title">Industrial / Tech Route</div>
+      <div class="route-steps">
+        <div class="step-chip"><span>&#9935;</span> Mining</div>
+        <span class="step-arrow">&#8594;</span>
+        <div class="step-chip"><span>&#9881;&#65039;</span> Manufacturing</div>
+        <span class="step-arrow">&#8594;</span>
+        <div class="step-chip"><span>&#128190;</span> Technology</div>
+        <span class="step-arrow">&#8594;</span>
+        <div class="step-chip"><span>&#128267;</span> Power Gen.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">My Stations</div>
+  <div class="economy-groups" id="econGroups"></div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">Profit Calculator</div>
+  <div class="calc-card">
+    <div class="calc-row">
+      <div class="calc-field">
+        <div class="flabel">Balance Before</div>
+        <input class="cinput" id="b1" type="number" placeholder="0" min="0">
+      </div>
+      <div class="calc-field">
+        <div class="flabel">Balance After</div>
+        <input class="cinput" id="b2" type="number" placeholder="0" min="0">
+      </div>
+      <button class="cbtn" id="calcBtn" type="button">Calculate</button>
+    </div>
+    <div class="cresult" id="cresult">
+      <span class="rlabel" id="rlabel">Profit</span>
+      <span class="rvalue" id="rvalue">0</span>
+    </div>
+  </div>
+
+</main>
+
+<script>
+var ECONOMIES = [
+  { id:'trading',       name:'Trading',           icon:'&#8987;',   color:'#f0c040', dim:'rgba(240,192,64,0.13)'  },
+  { id:'advanced',      name:'Advanced Materials', icon:'&#129516;', color:'#00d4aa', dim:'rgba(0,212,170,0.13)'   },
+  { id:'scientific',    name:'Scientific',         icon:'&#9879;',   color:'#60a5fa', dim:'rgba(96,165,250,0.13)'  },
+  { id:'mining',        name:'Mining',             icon:'&#9935;',   color:'#fb923c', dim:'rgba(251,146,60,0.13)'  },
+  { id:'manufacturing', name:'Manufacturing',      icon:'&#9881;',   color:'#8b90a0', dim:'rgba(139,144,160,0.13)' },
+  { id:'technology',    name:'Technology',         icon:'&#128190;', color:'#a78bfa', dim:'rgba(167,139,250,0.13)' },
+  { id:'power',         name:'Power Generation',   icon:'&#128267;', color:'#4ade80', dim:'rgba(74,222,128,0.13)'  }
+];
+
+var stations = {};
+ECONOMIES.forEach(function(e){ stations[e.id] = []; });
+
+function renderAll() {
+  var container = document.getElementById('econGroups');
+  container.innerHTML = '';
+  ECONOMIES.forEach(function(econ) {
+    var list = stations[econ.id] || [];
+    var div = document.createElement('div');
+    div.className = 'egroup';
+    div.id = 'grp-' + econ.id;
+
+    var itemsHTML = '';
+    if (list.length === 0) {
+      itemsHTML = '<li class="sempty">No stations yet — add one below</li>';
+    } else {
+      list.forEach(function(s, i) {
+        itemsHTML += '<li class="sitem">' +
+          '<span class="sbadge" style="background:' + econ.dim + ';color:' + econ.color + '">' + econ.name.split(' ')[0] + ' ' + s.num + '</span>' +
+          '<span class="sname">' + s.name + '</span>' +
+          '<button class="sdel" data-econ="' + econ.id + '" data-idx="' + i + '" type="button">&#x2715;</button>' +
+          '</li>';
+      });
+    }
+
+    div.innerHTML =
+      '<div class="egroup-header" data-toggle="' + econ.id + '">' +
+        '<div class="eicon" style="background:' + econ.dim + ';color:' + econ.color + '">' + econ.icon + '</div>' +
+        '<div class="ename">' + econ.name + '</div>' +
+        '<div class="ecount">' + list.length + '</div>' +
+        '<span class="echev">&#9660;</span>' +
+      '</div>' +
+      '<div class="ebody">' +
+        '<ul class="slist" id="sl-' + econ.id + '">' + itemsHTML + '</ul>' +
+        '<div class="add-row">' +
+          '<input class="add-input" id="inp-' + econ.id + '" placeholder="System name..." maxlength="40" type="text" style="--ec:' + econ.color + '">' +
+          '<button class="abtn" data-add="' + econ.id + '" type="button" style="--ec:' + econ.color + ';--ec-dim:' + econ.dim + '">+ Add</button>' +
+        '</div>' +
+      '</div>';
+
+    container.appendChild(div);
+  });
+
+  // Toggle headers
+  document.querySelectorAll('[data-toggle]').forEach(function(el) {
+    el.addEventListener('click', function() {
+      var id = el.getAttribute('data-toggle');
+      var grp = document.getElementById('grp-' + id);
+      grp.classList.toggle('open');
+    });
+  });
+
+  // Add buttons
+  document.querySelectorAll('[data-add]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var econId = btn.getAttribute('data-add');
+      var inp = document.getElementById('inp-' + econId);
+      var name = inp.value.trim();
+      if (!name) { inp.focus(); return; }
+      var list = stations[econId];
+      list.push({ name: name, num: list.length + 1 });
+      renderAll();
+      var grp = document.getElementById('grp-' + econId);
+      if (grp) grp.classList.add('open');
+    });
+  });
+
+  // Enter key on inputs
+  document.querySelectorAll('.add-input').forEach(function(inp) {
+    inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var econId = inp.id.replace('inp-', '');
+        var name = inp.value.trim();
+        if (!name) return;
+        stations[econId].push({ name: name, num: stations[econId].length + 1 });
+        renderAll();
+        var grp = document.getElementById('grp-' + econId);
+        if (grp) grp.classList.add('open');
+      }
+    });
+  });
+
+  // Delete buttons
+  document.querySelectorAll('.sdel').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var econId = btn.getAttribute('data-econ');
+      var idx = parseInt(btn.getAttribute('data-idx'));
+      stations[econId].splice(idx, 1);
+      stations[econId].forEach(function(s, i){ s.num = i + 1; });
+      renderAll();
+      var grp = document.getElementById('grp-' + econId);
+      if (grp) grp.classList.add('open');
+    });
+  });
+}
+
+// CALCULATOR
+document.getElementById('calcBtn').addEventListener('click', function() {
+  var b1 = parseFloat(document.getElementById('b1').value);
+  var b2 = parseFloat(document.getElementById('b2').value);
+  if (isNaN(b1) || isNaN(b2)) {
+    alert('Please enter both balance values.');
+    return;
+  }
+  var diff = b2 - b1;
+  var sign = diff >= 0 ? '+' : '';
+  document.getElementById('rvalue').textContent = sign + diff.toLocaleString('en-US') + ' Units';
+  document.getElementById('rvalue').className = 'rvalue ' + (diff >= 0 ? 'profit' : 'loss');
+  document.getElementById('rlabel').textContent = diff >= 0 ? 'Profit' : 'Loss';
+  var res = document.getElementById('cresult');
+  res.className = 'cresult show ' + (diff >= 0 ? 'profit-r' : 'loss-r');
+});
+
+// THEME TOGGLE
+var themeMode = 'dark';
+document.documentElement.setAttribute('data-theme', 'dark');
+document.getElementById('themeBtn').addEventListener('click', function() {
+  themeMode = themeMode === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', themeMode);
+});
+
+renderAll();
+// SAVE
+document.getElementById('saveBtn').addEventListener('click', function() {
+  var data = JSON.stringify(stations, null, 2);
+  var blob = new Blob([data], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'nms-stations.json';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+// LOAD
+document.getElementById('loadFile').addEventListener('change', function(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var loaded = JSON.parse(ev.target.result);
+      // merge with existing structure
+      ECONOMIES.forEach(function(ec) {
+        if (loaded[ec.id] && Array.isArray(loaded[ec.id])) {
+          stations[ec.id] = loaded[ec.id];
+        }
+      });
+      renderAll();
+      alert('Stations loaded successfully!');
+    } catch(err) {
+      alert('Could not read file. Make sure it is a valid NMS Trade Tracker save.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+</script>
+</body>
+</html>
