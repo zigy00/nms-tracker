@@ -1,0 +1,128 @@
+{
+  "trading": [
+    {
+      "name": "Nawenhot",
+      "num": 1
+    },
+    {
+      "name": "Pokrovy-Igg",
+      "num": 2
+    }
+  ],
+  "advanced": [
+    {
+      "name": "Getunga",
+      "num": 1
+    },
+    {
+      "name": "Eumseo",
+      "num": 2
+    }
+  ],
+  "scientific": [
+    {
+      "name": "Ordnandm XVII",
+      "num": 1
+    }
+  ],
+  "mining": [
+    {
+      "name": "Muchur XVI",
+      "num": 1
+    },
+    {
+      "name": "Yanshen",
+      "num": 2
+    },
+    {
+      "name": "Cheytham",
+      "num": 3
+    },
+    {
+      "name": "Kiyakhn-Ogori",
+      "num": 4
+    },
+    {
+      "name": "Aphoek",
+      "num": 5
+    }
+  ],
+  "manufacturing": [
+    {
+      "name": "Pacanonyv",
+      "num": 1
+    },
+    {
+      "name": "Racyreu",
+      "num": 2
+    },
+    {
+      "name": "Obinzh-Salak XVII",
+      "num": 3
+    },
+    {
+      "name": "Oxandho-Elyat",
+      "num": 4
+    },
+    {
+      "name": "Dawna II",
+      "num": 5
+    },
+    {
+      "name": "Gaqogouyu VII",
+      "num": 6
+    }
+  ],
+  "technology": [
+    {
+      "name": "Gusbrowl",
+      "num": 1
+    },
+    {
+      "name": "Rikazes",
+      "num": 2
+    },
+    {
+      "name": "Brutah",
+      "num": 3
+    },
+    {
+      "name": "Surash",
+      "num": 4
+    },
+    {
+      "name": "Ixungme-Onvol",
+      "num": 5
+    },
+    {
+      "name": "Jechuxi-Udsfo",
+      "num": 6
+    }
+  ],
+  "power": [
+    {
+      "name": "Pochins",
+      "num": 1
+    },
+    {
+      "name": "Udseyc",
+      "num": 2
+    },
+    {
+      "name": "Juangd",
+      "num": 3
+    },
+    {
+      "name": "Wonsvil",
+      "num": 4
+    },
+    {
+      "name": "Gohdalec",
+      "num": 5
+    },
+    {
+      "name": "Uietae-Uban XV",
+      "num": 6
+    }
+  ]
+}
